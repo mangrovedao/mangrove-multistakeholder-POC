@@ -133,6 +133,7 @@ contract MemberGroupTest is Test {
   }
 
   function testRemoveNonMember(address member, uint score) public {
+    vm.assume(member != address(this));
     _group.addMember(member, score);
     vm.expectRevert();
     _group.removeMember(address(this));
