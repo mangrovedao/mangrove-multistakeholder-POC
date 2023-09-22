@@ -19,7 +19,7 @@ contract MemberGroupDeployer is Deployer {
     smokeTest(admin, name);
   }
 
-  function smokeTest(address admin, string memory name) internal {
+  function smokeTest(address admin, string memory name) internal view {
     require(keccak256(abi.encodePacked(group.name())) == keccak256(abi.encodePacked(name)), "name does not match specified name");
 
     // Admin is admin
