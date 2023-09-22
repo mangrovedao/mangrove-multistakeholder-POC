@@ -1,0 +1,58 @@
+{
+  "symbol": "BuilderMGoV",
+  "operands": [
+    {
+      "type": "strategy",
+      "strategy": {
+        "name": "math",
+        "network": "5",
+        "symbol": "MATH",
+        "params":{
+          "operands": [
+            {
+              "type": "strategy",
+              "strategy": {
+                "network": "5",
+                "name": "contract-call",
+                "params": {
+                  "address": "0xbC2D0DF5cAEda42A5899320EeA926E189559DD1c",
+                  "symbol": "BuilderScore",
+                  "decimals": 0,
+                  "methodABI": {
+                    "name": "getScore",
+                    "type": "function",
+                    "inputs": [
+                      {
+                        "name": "account",
+                        "type": "address",
+                        "internalType": "address"
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "score",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                      }
+                    ],
+                    "stateMutability": "view"
+                  }
+                }
+              }
+            },
+            {
+              "type": "constant",
+              "value": 1000000000
+            }
+          ],
+          "operation": "multiply"
+        }
+      }
+    },
+    {
+      "type": "constant",
+      "value": 4
+    }
+  ],
+  "operation": "divide"
+}
