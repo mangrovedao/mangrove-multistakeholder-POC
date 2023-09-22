@@ -22,15 +22,7 @@ contract MGVTokenDeployer is Deployer {
   function smokeTest(address owner, uint initialSupply) internal {
     require(mgv.totalSupply() == initialSupply, "totalSupply does not match initialSupply");
 
-    // Owner can mint
-    uint balanceBefore = mgv.balanceOf(address(this));
-    vm.prank(owner);
-    mgv.mint(address(this), 1_000 ether);
-    require(mgv.balanceOf(address(this)) == balanceBefore + 1_000 ether, "owner minting failed");
-
-    // Non-owner cannot mint
-    vm.expectRevert("ERC20PresetMinterPauser: must have minter role to mint");
-    vm.prank(address(this));
-    mgv.mint(address(this), 1_000 ether);
+    // Admin is admin
+    require(mgv.hasRole(mgv.DEFAULT_ADMIN_ROLE(), owner), "admin is not admin");
   }
 }
