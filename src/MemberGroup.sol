@@ -41,6 +41,13 @@ contract MemberGroup is AccessControlEnumerable {
     return _scores[member];
   }
 
+  function getNormalizedScore(address member, uint scale) external view returns (uint) {
+    if (totalScore == 0) {
+      return 0;
+    }
+    return _scores[member] * scale / totalScore;
+  }
+
   // NB: Reverts if totalScore overflows
   function setScore(address member, uint score) external virtual onlyRole(UPDATER_ROLE) {
     _setScore(member, score);

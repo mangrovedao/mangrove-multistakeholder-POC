@@ -167,4 +167,18 @@ contract MemberGroupTest is Test {
     assertEq(_member, member);
     assertEq(_score, score2);
   }
+
+  // # getNormalizedScore tests
+
+  function testGetNormalizedScoreMultipleMembers(address member1, address member2, uint score1, uint score2, uint scale) public {
+    vm.assume(member1 != member2);
+    vm.assume(score1 < type(uint).max >> 128);
+    vm.assume(score2 < type(uint).max >> 128);
+    vm.assume(scale < type(uint).max >> 128);
+
+    _group.addMember(member1, score1);
+    _group.addMember(member2, score2);
+
+    assertEq(_group.getNormalizedScore(member1, scale), score1 + score2 == 0 ? 0 : scale * score1 / (score1 + score2));
+  }
 }
