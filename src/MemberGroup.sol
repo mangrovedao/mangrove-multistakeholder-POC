@@ -13,6 +13,7 @@ contract MemberGroup is AccessControlEnumerable {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   string public name;
+  uint public totalScore;
 
   EnumerableSet.AddressSet private _members;
   mapping(address member => uint score) private _scores;
@@ -26,37 +27,44 @@ contract MemberGroup is AccessControlEnumerable {
     name = _name;
   }
 
-  function addMember(address member, uint score) public virtual onlyRole(ADDER_ROLE) {
+  function addMember(address member, uint score) external virtual onlyRole(ADDER_ROLE) {
     _members.add(member);
-    _scores[member] = score;
+    _setScore(member, score);
   }
 
-  function removeMember(address member) public virtual onlyRole(REMOVER_ROLE) {
+  function removeMember(address member) external virtual onlyRole(REMOVER_ROLE) {
+    _setScore(member, 0);
     _members.remove(member);
-    _scores[member] = 0;
   }
 
-  function getScore(address member) public view returns (uint) {
+  function getScore(address member) external view returns (uint) {
     return _scores[member];
   }
 
-  function setScore(address member, uint score) public virtual onlyRole(UPDATER_ROLE) {
+  // NB: Reverts if totalScore overflows
+  function setScore(address member, uint score) external virtual onlyRole(UPDATER_ROLE) {
+    _setScore(member, score);
+  }
+
+  function _setScore(address member, uint score) internal {
     if (!_members.contains(member)) {
       revert("setScore/notMember");
     }
+    totalScore -= _scores[member];
     _scores[member] = score;
+    totalScore += score;
   }
 
-  function getMemberCount() public view returns (uint) {
+  function getMemberCount() external view returns (uint) {
     return _members.length();
   }
 
-  function getMember(uint index) public view returns (address member, uint score) {
+  function getMember(uint index) external view returns (address member, uint score) {
     member = _members.at(index);
     score = _scores[member];
   }
 
-  function getMembers() public view returns (address[] memory members, uint[] memory scores) {
+  function getMembers() external view returns (address[] memory members, uint[] memory scores) {
     uint memberCount = _members.length();
     members = new address[](memberCount);
     scores = new uint[](memberCount);

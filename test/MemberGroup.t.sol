@@ -38,11 +38,16 @@ contract MemberGroupTest is Test {
 
   function testAddMember(address member, uint score) public {
     _group.addMember(member, score);
+
     assertEq(_group.getMemberCount(), 1);
+
     (address _member, uint _score) = _group.getMember(0);
     assertEq(_member, member);
     assertEq(_score, score);
+
     assertEq(_group.getScore(member), score);
+    assertEq(_group.totalScore(), score);
+
     (address[] memory members, uint[] memory scores) = _group.getMembers();
     assertEq(members.length, 1);
     assertEq(scores.length, 1);
@@ -55,11 +60,13 @@ contract MemberGroupTest is Test {
 
     _group.addMember(member, score);
     assertEq(_group.getScore(member), score);
+    assertEq(_group.totalScore(), score);
 
     _group.addMember(member, score2);
     assertEq(_group.getMemberCount(), 1);
 
     assertEq(_group.getScore(member), score2);
+    assertEq(_group.totalScore(), score2);
 
     (address _member, uint _score) = _group.getMember(0);
     assertEq(_member, member);
@@ -68,6 +75,8 @@ contract MemberGroupTest is Test {
 
   function testAddTwoMembers(address member1, address member2, uint score1, uint score2) public {
     vm.assume(member1 != member2);
+    vm.assume(score1 < type(uint).max/2);
+    vm.assume(score2 < type(uint).max/2);
 
     _group.addMember(member1, score1);
     _group.addMember(member2, score2);
@@ -83,6 +92,7 @@ contract MemberGroupTest is Test {
 
     assertEq(_group.getScore(member1), score1);
     assertEq(_group.getScore(member2), score2);
+    assertEq(_group.totalScore(), score1 + score2);
 
     (address[] memory members, uint[] memory scores) = _group.getMembers();
     assertEq(members.length, 2);
@@ -115,6 +125,7 @@ contract MemberGroupTest is Test {
     _group.getMember(0);
 
     assertEq(_group.getScore(member), 0);
+    assertEq(_group.totalScore(), 0);
 
     (address[] memory members, uint[] memory scores) = _group.getMembers();
     assertEq(members.length, 0);
@@ -123,10 +134,11 @@ contract MemberGroupTest is Test {
 
   function testRemoveNonMember(address member, uint score) public {
     _group.addMember(member, score);
-    // noop
+    vm.expectRevert();
     _group.removeMember(address(this));
     assertEq(_group.getMemberCount(), 1);
     assertEq(_group.getScore(member), score);
+    assertEq(_group.totalScore(), score);
   }
 
   // # setScore tests
@@ -150,6 +162,7 @@ contract MemberGroupTest is Test {
     _group.addMember(member, score);
     _group.setScore(member, score2);
     assertEq(_group.getScore(member), score2);
+    assertEq(_group.totalScore(), score2);
     (address _member, uint _score) = _group.getMember(0);
     assertEq(_member, member);
     assertEq(_score, score2);
